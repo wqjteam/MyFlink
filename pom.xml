@@ -52,6 +52,11 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.7.0</version>
                 </plugin>
+                <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -95,6 +100,40 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <!-- 输出目录 -->
+                            <outputDirectory>${project.build.outputDirectory}/keystore</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <!-- 资源目录 -->
+                                    <directory>${project.basedir}/keystore</directory>
+                                    <includes>
+                                        <include>**/*.jks</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+                <!--<configuration>-->
+                    <!--<nonFilteredFileExtensions>-->
+                        <!--<nonFilteredFileExtension>pdf</nonFilteredFileExtension>-->
+                        <!--<nonFilteredFileExtension>swf</nonFilteredFileExtension>-->
+                        <!--<nonFilteredFileExtension>data</nonFilteredFileExtension>-->
+                    <!--</nonFilteredFileExtensions>-->
+                <!--</configuration>-->
+            </plugin>
+
+
         </plugins>
     </build>
 
