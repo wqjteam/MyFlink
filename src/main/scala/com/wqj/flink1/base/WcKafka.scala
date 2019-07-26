@@ -41,23 +41,42 @@ object WcKafka {
       .flatMap(_.split(" "))
       .filter(x => x != null)
       .map((_, 1))
+      /**
+        * 相当于groupby第一个字段
+        * */
       .keyBy(0)
       .sum(1)
+      /**
+        * 设置并发度,相当于repartiion或者coalesce
+        * */
       .setParallelism(2)
-      .map(x => (x._1, x._2.toString))
+      .map(x => (x._1, x._2.toString))/**返回为tuple*/
+    /**
+      * 设置redis的端口
+      * */
     val conf = new FlinkJedisPoolConfig.Builder().setHost("hadoop1").setPort(6379).build()
     val sink = new RedisSink[(String, String)](conf, new RedisExampleMapper)
     wordcount.print()
     wordcount.addSink(sink)
+    /**
+      * 开始执行,相当于streaming 的action算子
+      * 为显示触发
+      * */
     env.execute("flink streaming")
   }
 }
 
+/**
+  * 在flink on yarn集群中直接写入redis
+  * */
 class RedisExampleMapper extends RedisMapper[(String, String)] {
   override def getCommandDescription: RedisCommandDescription = {
     new RedisCommandDescription(RedisCommand.SET, null)
   }
 
+  /**
+    * 该方法可以直接通过.map(_=>{_.1})或者.map(_=>{_.2})提取
+    * */
   override def getKeyFromData(data: (String, String)): String = data._1
 
   override def getValueFromData(data: (String, String)): String = data._2
