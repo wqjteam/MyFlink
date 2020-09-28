@@ -14,12 +14,13 @@ public class KafkaProducerBase {
          KafkaProducer producer = new KafkaProducer(kafkaProperties);
         producer = new KafkaProducer<String, String>(kafkaProperties);
 
-        String data = "hah hah hha hh dad hhda hhad a a b b b b ";
+        String data = "hah hah hha hh dad hhda hhad a a b b b b cc c c ccc c c";
         try {
             int i = 0;
 
             while (i < 500) {
                 producer.send(new ProducerRecord<String, String>("flink_test",data));
+                System.out.println("输出第"+i+"次");
                 Thread.sleep(500);
                 i++;
             }
