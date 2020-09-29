@@ -10,7 +10,7 @@ object OffLineWC {
       val basedata = record.split(";")
       val data2=for (i <- 0 until basedata.length - 1)
         yield basedata(i) + "_" + basedata(i + 1)
-      basedata.toArray
+      data2.toArray
     })
     val data3 = data2.flatMap(_.seq)
     val data4 = data3.map((_, 1))
