@@ -20,7 +20,7 @@ object OffLineBatch {
       * 对内存中的数据进行计算
       * */
     val counts = text.flatMap { _.toLowerCase.split(",") filter { _.nonEmpty } }
-      .map { (_, 1) }
+      .map { record=>(record, 1) }
       .groupBy(0)
       .sum(1)
 
