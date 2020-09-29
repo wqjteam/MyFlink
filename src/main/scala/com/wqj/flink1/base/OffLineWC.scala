@@ -1,5 +1,10 @@
 package com.wqj.flink1.base
 
+
+
+import java.sql.DriverManager
+
+import com.mysql.jdbc.PreparedStatement
 import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.api.scala._
 
@@ -28,6 +33,17 @@ object OffLineWC {
     //按照单词聚合
     val reduce = group_map.reduce((x, y) => (x._1, x._2 + y._2))
     reduce.print()
-    reduce.output()
+    val lastsink=reduce.mapPartition(record => {
+      Class.forName("com.mysql.jdbc.Driver").newInstance()
+      val conn = DriverManager.getConnection("jdbc:mysql://192.168.4.110:3306/flink_test", "root", "123456")
+      record.map(x => {
+        val statement = conn.prepareStatement("insert into data_test(data,number) values(?,?)")
+
+        statement.setString(1, x._1)
+        statement.setInt(2, x._2)
+        statement.execute()
+      })
+
+    }).print()
   }
 }
