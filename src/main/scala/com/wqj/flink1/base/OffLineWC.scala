@@ -2,13 +2,14 @@ package com.wqj.flink1.base
 
 import org.apache.flink.api.scala.ExecutionEnvironment
 import org.apache.flink.api.scala._
+
 object OffLineWC {
   def main(args: Array[String]): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val data = env.readTextFile("workspace/input/wordcountASSA")
     val data2 = data.map(record => {
       val basedata = record.split(";")
-      val data2=for (i <- 0 until basedata.length - 1)
+      val data2 = for (i <- 0 until basedata.length - 1)
         yield basedata(i) + "_" + basedata(i + 1)
       data2.toArray
     })
@@ -19,5 +20,14 @@ object OffLineWC {
     data6.print()
 
 
+    val elements: DataSet[Array[Tuple2[String, Int]]] = env.fromElements(Array(("java", 1), ("scala", 1), ("java", 1)))
+
+    val tuple_map = elements.flatMap(x => x)
+    val group_map: GroupedDataSet[(String, Int)] = tuple_map.groupBy(x => x._1)
+    //拆开里面的list，编程tuple
+    //按照单词聚合
+    val reduce = group_map.reduce((x, y) => (x._1, x._2 + y._2))
+    reduce.print()
+    reduce.output()
   }
 }

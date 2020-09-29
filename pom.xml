@@ -10,16 +10,15 @@
 
 
     <dependencies>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.flink</groupId>-->
-<!--            <artifactId>flink-scala_2.11</artifactId>-->
-<!--            <version>1.1.0</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.flink</groupId>-->
+        <!--            <artifactId>flink-scala_2.11</artifactId>-->
+        <!--            <version>1.10.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-clients_2.11</artifactId>
             <version>1.10.0</version>
-            <!--            <scope>provided</scope>-->
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -31,7 +30,17 @@
             <artifactId>flink-connector-kafka_2.11</artifactId>
             <version>1.10.0</version>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.flink</groupId>-->
+        <!--            <artifactId>flink-table_2.11</artifactId>-->
+        <!--            <version>1.10.0</version>-->
+        <!--        </dependency>-->
 
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.38</version>
+        </dependency>
 
 
         <dependency>
@@ -52,24 +61,16 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.kafka</groupId>-->
-<!--            <artifactId>kafka_2.12</artifactId>-->
-<!--            <version>1.1.0</version>-->
-<!--        </dependency>-->
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
-            <version>1.1.0</version>
-        </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.kafka</groupId>-->
+        <!--            <artifactId>kafka_2.12</artifactId>-->
+        <!--            <version>1.1.0</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.68</version>
         </dependency>
-
-
-
 
 
     </dependencies>
@@ -88,9 +89,9 @@
                     <version>3.7.0</version>
                 </plugin>
                 <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.0.2</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.0.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -160,11 +161,11 @@
                     </execution>
                 </executions>
                 <!--<configuration>-->
-                    <!--<nonFilteredFileExtensions>-->
-                        <!--<nonFilteredFileExtension>pdf</nonFilteredFileExtension>-->
-                        <!--<nonFilteredFileExtension>swf</nonFilteredFileExtension>-->
-                        <!--<nonFilteredFileExtension>data</nonFilteredFileExtension>-->
-                    <!--</nonFilteredFileExtensions>-->
+                <!--<nonFilteredFileExtensions>-->
+                <!--<nonFilteredFileExtension>pdf</nonFilteredFileExtension>-->
+                <!--<nonFilteredFileExtension>swf</nonFilteredFileExtension>-->
+                <!--<nonFilteredFileExtension>data</nonFilteredFileExtension>-->
+                <!--</nonFilteredFileExtensions>-->
                 <!--</configuration>-->
             </plugin>
 
