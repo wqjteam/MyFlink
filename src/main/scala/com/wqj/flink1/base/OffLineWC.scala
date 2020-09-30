@@ -4,9 +4,7 @@ package com.wqj.flink1.base
 
 import java.sql.DriverManager
 
-import com.mysql.jdbc.PreparedStatement
-import org.apache.flink.api.scala.ExecutionEnvironment
-import org.apache.flink.api.scala._
+import org.apache.flink.api.scala.{ExecutionEnvironment, _}
 
 object OffLineWC {
   def main(args: Array[String]): Unit = {
@@ -44,6 +42,8 @@ object OffLineWC {
         statement.execute()
       })
 
-    }).print()
+    })
+    lastsink
+//      .print()
   }
 }
