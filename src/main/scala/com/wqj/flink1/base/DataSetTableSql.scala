@@ -9,7 +9,7 @@ import org.apache.flink.table.api.scala.BatchTableEnvironment
 
 case class person(id: Int, name: String, age: Int)
 
-object TableSql {
+object DataSetTableSql {
   def main(args: Array[String]): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tableEnv = BatchTableEnvironment.create(env)
