@@ -25,6 +25,6 @@ object DataSetTableSql {
     val result = tableEnv.sqlQuery("select *  from person where id=1")
     val rows = result.collect()
     print(rows)
-    env.execute("table_task")
+    env.execute("dataset_table_task")
   }
 }
