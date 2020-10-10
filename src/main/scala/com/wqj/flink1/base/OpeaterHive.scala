@@ -8,7 +8,7 @@ object OpeaterHive {
   def main(args: Array[String]): Unit = {
     val settings = EnvironmentSettings.newInstance().useBlinkPlanner().inBatchMode().build()
     val tableEnv = TableEnvironment.create(settings)
-    val hive = new HiveCatalog("myhive", "ods", "", "2.3.7")
+    val hive = new HiveCatalog("myhive", "ods", "hive-site.xml", "2.3.7")
     tableEnv.registerCatalog("myhive",hive)
     tableEnv.useCatalog("myhive")
     val result=tableEnv.sqlQuery("select * from ods.student")
