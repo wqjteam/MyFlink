@@ -1,48 +1,48 @@
 package com.wqj.flink1.sink
 
+import com.alibaba.fastjson.JSON
+import com.wqj.flink1.base.person
+import org.apache.flink.configuration.Configuration
+import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
+import org.apache.flink.streaming.api.scala._
+import org.apache.hadoop.conf
+import org.apache.hadoop.hbase.{HBaseConfiguration, HConstants, TableName}
+import org.apache.hadoop.hbase.client._
+class HbaseSink extends  RichSinkFunction[person] {
+  //  创建连接
+  var conn: Connection = _
+  //  创建BufferedMutator
+  //  作用类似put，可以实现批量异步
+  var mutator:BufferedMutator = null
 
-import org.apache.flink.streaming.api.functions.sink.SinkFunction
-import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.fs.Path
-import org.apache.hadoop.hbase.HBaseConfiguration
-import org.apache.hadoop.hbase.TableName
-import org.apache.hadoop.hbase.client.Connection
-import org.apache.hadoop.hbase.client.ConnectionFactory
-import org.apache.hadoop.hbase.client.Put
-import org.apache.hadoop.hbase.client.Table
-import org.apache.hadoop.hbase.io.crypto.Context
-import org.apache.hadoop.hbase.util.Bytes
-import org.apache.log4j.Logger
+  override def open(parameters: Configuration): Unit = {
+    val config: conf.Configuration = HBaseConfiguration.create()
 
-class HbaseSink extends SinkFunction[String] {
-  lazy val logger = Logger.getLogger("HbaseSink")
+    //    设置zookeeper主机名
+    config.set(HConstants.ZOOKEEPER_QUORUM,"192.168.4.110")
+    //    设置端口
+    config.set(HConstants.ZOOKEEPER_CLIENT_PORT,"2181")
+    //    实例化
+    conn = ConnectionFactory.createConnection(config)
 
-  @Override
-  def invoke(value: String, context: Context): Unit = {
-    var connection: Connection = null
-    var table: Table = null
-    try { // 加载HBase的配置
-      val configuration = HBaseConfiguration.create
-      // 读取配置文件
-      configuration.addResource(new Path(ClassLoader.getSystemResource("hbase-site.xml").toURI))
-      configuration.addResource(new Path(ClassLoader.getSystemResource("core-site.xml").toURI))
-      connection = ConnectionFactory.createConnection(configuration)
-      val tableName = TableName.valueOf("test")
-      // 获取表对象
-      table = connection.getTable(tableName)
-      //row1:cf:a:aaa
-      val split = value.split(":")
-      // 创建一个put请求，用于添加数据或者更新数据
-      val put = new Put(Bytes.toBytes(split(0)))
-      put.addColumn(Bytes.toBytes(split(1)), Bytes.toBytes(split(2)), Bytes.toBytes(split(3)))
-      table.put(put)
-      logger.error("[HbaseSink] : put value:{} to hbase")
-    } catch {
-      case e: Exception =>
-        logger.error("error:", e)
-    } finally {
-      if (null != table) table.close
-      if (null != connection) connection.close
-    }
+    val tableName: TableName = TableName.valueOf("person")
+
+    val params = new BufferedMutatorParams(tableName)
+
+    mutator = conn.getBufferedMutator(params)
+
+  }
+
+  override def invoke(value: person, context: SinkFunction.Context[_]): Unit = {
+    val family = "info"
+    val put = new Put(value.id.toString.getBytes())
+    put.addColumn(family.getBytes(),"name".getBytes(),value.name.getBytes())
+    put.addColumn(family.getBytes(),"age".getBytes(),value.age.toString.getBytes())
+    mutator.mutate(put)
+  }
+
+  override def close(): Unit = {
+    mutator.close()
+    conn.close()
   }
 }

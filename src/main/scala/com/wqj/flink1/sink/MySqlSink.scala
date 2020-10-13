@@ -9,7 +9,7 @@ import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 
 class MySqlSink extends RichSinkFunction[Student] {
-  val jdbcUrl = "jdbc:mysql://192.168.4.110:3306?useSSL=false&allowPublicKeyRetrieval=true"
+  val jdbcUrl = "jdbc:mysql://192.168.4.110:3306/flink_test?useSSL=false&allowPublicKeyRetrieval=true"
   val username = "root"
   val password = "123456"
   val driverName = "com.mysql.jdbc.Driver"
