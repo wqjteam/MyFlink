@@ -88,12 +88,12 @@
             <scope>provided</scope>
         </dependency>
 
+
         <!-- Hive Dependency -->
         <dependency>
             <groupId>org.apache.hive</groupId>
             <artifactId>hive-exec</artifactId>
             <version>${hive.version}</version>
-            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -122,16 +122,10 @@
             <version>${flink.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-client</artifactId>
-            <version>${hdfs.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-hbase_${scala.version}</artifactId>
             <version>${flink.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/org.apache.hadoop/hadoop-common -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-filesystem_${scala.version}</artifactId>
