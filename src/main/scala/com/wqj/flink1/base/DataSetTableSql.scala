@@ -3,7 +3,7 @@ package com.wqj.flink1.base
 import org.apache.flink.api.scala._
 import org.apache.flink.table.api.scala._
 import org.apache.flink.streaming.api.scala._
-import org.apache.flink.table.api.Table
+import org.apache.flink.table.api.{EnvironmentSettings, Table}
 import org.apache.flink.table.api.scala.BatchTableEnvironment
 
 
@@ -13,6 +13,8 @@ object DataSetTableSql {
   def main(args: Array[String]): Unit = {
     val env = ExecutionEnvironment.getExecutionEnvironment
     val tableEnv = BatchTableEnvironment.create(env)
+    //    val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useOldPlanner().inBatchMode().build()
+    //    val tableEnv: StreamTableEnvironment = StreamTableEnvironment.create(env, settings)
     val persondata: DataSet[String] = env.readTextFile("workspace/input/person")
     import org.apache.flink.api.scala._
     val person_dset = persondata.map(str => {

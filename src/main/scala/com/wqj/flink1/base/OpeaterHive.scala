@@ -12,6 +12,7 @@ object OpeaterHive {
     tableEnv.registerCatalog("myhive",hive)
     tableEnv.useCatalog("myhive")
     val result=tableEnv.sqlQuery("select * from ods.student")
+
     tableEnv.execute("OpeaterHive")
   }
 }

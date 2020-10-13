@@ -14,7 +14,7 @@ public class KafkaProducerBase {
          KafkaProducer producer = new KafkaProducer(kafkaProperties);
         producer = new KafkaProducer<String, String>(kafkaProperties);
 
-        String data = "hah hah hha hh dad hhda hhad a a b b b b cc c c ccc c c";
+        String data = "1,zs,1";
         try {
             int i = 0;
 

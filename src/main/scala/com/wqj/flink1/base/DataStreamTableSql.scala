@@ -7,6 +7,7 @@ import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
+import org.apache.flink.table.api.EnvironmentSettings
 import org.apache.flink.table.api.scala.StreamTableEnvironment
 import org.apache.log4j.Logger
 
@@ -24,7 +25,8 @@ object DataStreamTableSql {
     properties.setProperty("zookeeper.connect", zk)
     properties.setProperty("bootstrap.servers", broker)
     properties.setProperty("group.id", group_id)
-    val StreamTableEnv = StreamTableEnvironment.create(env)
+    val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useOldPlanner().inStreamingMode().build()
+    val StreamTableEnv: StreamTableEnvironment = StreamTableEnvironment.create(env,settings)
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     env.enableCheckpointing(5000)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
