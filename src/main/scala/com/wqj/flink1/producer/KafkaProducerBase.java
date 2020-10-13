@@ -19,7 +19,8 @@ public class KafkaProducerBase {
             int i = 0;
 
             while (i < 500) {
-                producer.send(new ProducerRecord<String, String>("flink_test",data));
+                producer.send(new ProducerRecord<
+                        String, String>("flink_test",data));
                 System.out.println("输出第"+i+"次");
                 Thread.sleep(500);
                 i++;
