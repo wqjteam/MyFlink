@@ -24,10 +24,11 @@ import org.apache.log4j.Logger
 object WcKafka {
   private val zk = "flinkmaster:2181"
   private val broker = "flinkmaster:9092"
-  private val group_id = "w1"
+  private val group_id = "w2"
   private val topic = "flink_test_student"
 
   def main(args: Array[String]): Unit = {
+    System.setProperty("HADOOP_USER_NAME","root")
     lazy val logger = Logger.getLogger(WcKafka.getClass)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
@@ -77,7 +78,7 @@ object WcKafka {
     val ms = new MySqlSink
     wordcount.addSink(ms)
     wordcount.addSink(StreamingFileSink
-      .forRowFormat(new Path("hdfs://192.168.4.110:9000/tmpfile/studenttxt/"), new SimpleStringEncoder[Student]("utf-8"))
+      .forRowFormat(new Path("hdfs://192.168.4.110:9000/tmpfile/studenttxt2/"), new SimpleStringEncoder[Student]("utf-8"))
       .withRollingPolicy(
         DefaultRollingPolicy.builder()
           .withRolloverInterval(TimeUnit.SECONDS.toSeconds(5)) //10min 生成一个文件
