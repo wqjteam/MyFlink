@@ -41,8 +41,16 @@ object OperateHdfs {
       val field = x.split(",")
       person(field(0).toInt, field(1), field(2).toInt)
     }).setParallelism(1)
-    stream.addSink(new HDFSSink[person]("/tmpfile/flinkfile").sinkRow)
-//    stream.addSink(new HDFSSink[person]("/tmpfile/flinkfile").sinkParquet)
+    stream.addSink(StreamingFileSink
+      .forRowFormat(new Path("hdfs://192.168.4.110:9000/tmpfile/txt/"), new SimpleStringEncoder[person]("utf-8"))
+      .withRollingPolicy(
+      DefaultRollingPolicy.builder()
+        .withRolloverInterval(TimeUnit.SECONDS.toSeconds(10)) //10min 生成一个文件
+        .withInactivityInterval(TimeUnit.SECONDS.toSeconds(5)) //5min未接收到数据，生成一个文件
+        .withMaxPartSize( 10) //文件大小达到1G
+        .build())
+      .build())
+    stream.print()
     env.execute("OperateHdfs")
   }
 }

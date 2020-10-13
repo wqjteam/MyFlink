@@ -16,11 +16,11 @@ object DataStreamTableSql {
   private val zk = "flinkmaster:2181"
   private val broker = "flinkmaster:9092"
   private val group_id = "DSTS2"
-  private val topic = "flink_Table_test"
+  private val topic = "flink_test"
 
   def main(args: Array[String]): Unit = {
     lazy val logger = Logger.getLogger(WcKafka.getClass)
-    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
     val properties = new Properties()
     properties.setProperty("zookeeper.connect", zk)
     properties.setProperty("bootstrap.servers", broker)

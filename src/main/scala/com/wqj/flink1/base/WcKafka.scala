@@ -1,9 +1,14 @@
 package com.wqj.flink1.base
 
+import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 
+import com.wqj.flink1.pojo.Student
 import com.wqj.flink1.sink.{MySqlSink, RedisExampleMapper}
-import org.apache.flink.api.common.serialization.SimpleStringSchema
+import org.apache.flink.api.common.serialization.{SimpleStringEncoder, SimpleStringSchema}
+import org.apache.flink.core.fs.Path
+import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink
+import org.apache.flink.streaming.api.functions.sink.filesystem.rollingpolicies.DefaultRollingPolicy
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
@@ -19,14 +24,14 @@ import org.apache.log4j.Logger
 object WcKafka {
   private val zk = "flinkmaster:2181"
   private val broker = "flinkmaster:9092"
-  private val group_id = "wc1"
-  private val topic = "flink_test"
+  private val group_id = "w1"
+  private val topic = "flink_test_student"
 
   def main(args: Array[String]): Unit = {
     lazy val logger = Logger.getLogger(WcKafka.getClass)
     val env = StreamExecutionEnvironment.getExecutionEnvironment
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
-    env.enableCheckpointing(5000)
+    env.enableCheckpointing(50)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
     val properties = new Properties()
     properties.setProperty("zookeeper.connect", zk)
@@ -38,7 +43,7 @@ object WcKafka {
       x
     })
     val wordcount = stream
-      .flatMap(_.split(" "))
+      .flatMap(_.split(","))
       .filter(x => x != null)
       .map((_, 1))
 
@@ -53,7 +58,7 @@ object WcKafka {
         **/
       .setParallelism(3)
       .map(x => {
-        (x._1, x._2.toString)
+        Student(x._1, x._2)
         //        Student(x._1, x._2)
       })
 
@@ -67,11 +72,20 @@ object WcKafka {
     val redisSink = new RedisSink[(String, String)](conf, new RedisExampleMapper)
 
 
-    wordcount.print()
+//    wordcount.print()
     //    wordcount.addSink(redisSink)
     val ms = new MySqlSink
-    //    wordcount.addSink(ms)
-
+    wordcount.addSink(ms)
+    wordcount.addSink(StreamingFileSink
+      .forRowFormat(new Path("hdfs://192.168.4.110:9000/tmpfile/studenttxt/"), new SimpleStringEncoder[Student]("utf-8"))
+      .withRollingPolicy(
+        DefaultRollingPolicy.builder()
+          .withRolloverInterval(TimeUnit.SECONDS.toSeconds(5)) //10min 生成一个文件
+          .withInactivityInterval(TimeUnit.SECONDS.toSeconds(2)) //5min未接收到数据，生成一个文件
+          .withMaxPartSize( 10) //文件大小达到1G
+          .build())
+      .build())
+    wordcount.print()
     /**
       * 开始执行,相当于streaming 的action算子
       * 为显示触发
