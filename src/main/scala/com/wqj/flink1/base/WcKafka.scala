@@ -3,7 +3,7 @@ package com.wqj.flink1.base
 import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 
-import com.wqj.flink1.pojo.Student
+import com.wqj.flink1.pojo.{RedisBasePojo, Student}
 import com.wqj.flink1.sink.{MySqlSink, RedisExampleMapper}
 import org.apache.flink.api.common.serialization.{SimpleStringEncoder, SimpleStringSchema}
 import org.apache.flink.core.fs.Path
@@ -70,7 +70,7 @@ object WcKafka {
       * 设置redis的端口
       **/
     val conf = new FlinkJedisPoolConfig.Builder().setHost("flinkmaster").setPort(6379).build()
-    val redisSink = new RedisSink[(String, String)](conf, new RedisExampleMapper)
+    val redisSink = new RedisSink[RedisBasePojo](conf, new RedisExampleMapper)
 
 
 //    wordcount.print()

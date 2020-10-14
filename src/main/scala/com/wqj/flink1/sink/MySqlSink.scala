@@ -3,7 +3,6 @@ package com.wqj.flink1.sink
 
 import java.sql.{Connection, DriverManager}
 
-import com.alibaba.fastjson.{JSON, JSONObject}
 import com.wqj.flink1.pojo.Student
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}

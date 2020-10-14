@@ -2,14 +2,17 @@ package com.wqj.flink1.base
 
 import java.util.Properties
 
-import com.wqj.flink1.sink.HbaseSink
+import com.google.gson.Gson
+import com.wqj.flink1.pojo.RedisBasePojo
+import com.wqj.flink1.sink.{HbaseSink, RedisExampleMapper}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
+import org.apache.flink.streaming.connectors.redis.RedisSink
+import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolConfig
+import org.apache.flink.table.api.EnvironmentSettings
 import org.apache.flink.table.api.scala.StreamTableEnvironment
-import org.apache.flink.table.api.{DataTypes, EnvironmentSettings}
-import org.apache.flink.table.descriptors._
 
 
 object OperateHbase {
@@ -44,9 +47,25 @@ object OperateHbase {
       person(field(0).toInt, field(1), field(2).toInt)
     })
     tableEnv.createTemporaryView("person", tableEnv.fromDataStream(stream))
-    val kafkastream=tableEnv.sqlQuery("select * from person")
-    val streamresult=tableEnv.toAppendStream[person](kafkastream)
+    val kafkastream = tableEnv.sqlQuery("select * from person")
+    val streamresult = tableEnv.toAppendStream[person](kafkastream)
+    /**
+      * hbase
+      * */
     streamresult.addSink(new HbaseSink).name("hbasesink")
+    /**
+      * redis
+      **/
+    val redisS=streamresult.map(person => {
+     new RedisBasePojo(person.id.toString,  new Gson().toJson(person))
+    })
+
+    val conf = new FlinkJedisPoolConfig.Builder().setHost("flinkmaster").setPort(6379).build()
+    val redisSink = new RedisSink[RedisBasePojo](conf, new RedisExampleMapper)
+    redisS.addSink(redisSink)
+    /**
+      * hive
+      * */
     env.execute("OperateHbase")
   }
 }
