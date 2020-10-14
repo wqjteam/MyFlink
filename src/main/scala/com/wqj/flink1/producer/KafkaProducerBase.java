@@ -15,7 +15,7 @@ public class KafkaProducerBase {
         KafkaProducer producer = new KafkaProducer(kafkaProperties);
         producer = new KafkaProducer<String, String>(kafkaProperties);
 
-        String data = "1,zs,1";
+        String data = ",zs,";
 //        data = "li,zs,ww";
         String topic = "flink_test";
 //        topic = "flink_test_student";
@@ -23,6 +23,7 @@ public class KafkaProducerBase {
             int i = 0;
 
             while (i < 2000) {
+                data = ((int) (Math.random() * 10000)) + ",zs,"+((int) (Math.random() * 10000));
                 producer.send(new ProducerRecord<
                         String, String>(topic, data));
                 System.out.println("输出第" + i + "次");
