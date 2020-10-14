@@ -4,7 +4,7 @@ import java.util.Properties
 
 import com.google.gson.Gson
 import com.wqj.flink1.pojo.RedisBasePojo
-import com.wqj.flink1.output.{HbaseSink, RedisExampleMapper}
+import com.wqj.flink1.output.{FileProcessWindowFunction, HbaseSink, RedisExampleMapper}
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.windowing.time.Time
@@ -67,7 +67,7 @@ object OperateHbase {
     /**
       * hive
       * */
-    streamresult.timeWindowAll(Time.seconds(60*1)).process()
+    streamresult.timeWindowAll(Time.seconds(60*1)).process(new FileProcessWindowFunction)
     env.execute("OperateHbase")
   }
 }
