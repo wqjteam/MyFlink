@@ -1,4 +1,4 @@
-package com.wqj.flink1.sink
+package com.wqj.flink1.output
 
 import com.wqj.flink1.base.person
 import org.apache.flink.configuration.Configuration

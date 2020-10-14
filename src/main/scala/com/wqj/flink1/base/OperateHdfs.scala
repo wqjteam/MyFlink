@@ -4,7 +4,7 @@ import java.time.ZoneId
 import java.util.Properties
 import java.util.concurrent.TimeUnit
 
-import com.wqj.flink1.sink.HDFSSink
+import com.wqj.flink1.output.HDFSSink
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.api.common.serialization.{SimpleStringEncoder, SimpleStringSchema}
 import org.apache.flink.core.fs.Path

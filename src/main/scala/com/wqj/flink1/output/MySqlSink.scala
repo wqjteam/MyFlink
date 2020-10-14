@@ -1,4 +1,4 @@
-package com.wqj.flink1.sink
+package com.wqj.flink1.output
 
 
 import java.sql.{Connection, DriverManager}

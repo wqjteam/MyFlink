@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 import java.util.{Collections, Properties}
 
 import com.wqj.flink1.pojo.{RedisBasePojo, Student}
-import com.wqj.flink1.sink.{MySqlSink, RedisExampleMapper}
+import com.wqj.flink1.output.{MySqlSink, RedisExampleMapper}
 import org.apache.flink.api.common.serialization.{SimpleStringEncoder, SimpleStringSchema}
 import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink
