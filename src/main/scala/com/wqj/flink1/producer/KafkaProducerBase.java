@@ -16,9 +16,9 @@ public class KafkaProducerBase {
         producer = new KafkaProducer<String, String>(kafkaProperties);
 
         String data = "1,zs,1";
-        data = "li,zs,ww";
+//        data = "li,zs,ww";
         String topic = "flink_test";
-        topic = "flink_test_student";
+//        topic = "flink_test_student";
         try {
             int i = 0;
 
