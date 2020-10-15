@@ -33,15 +33,15 @@ object DataStreamTableSql {
     val kafkaSource = new FlinkKafkaConsumer(topic, new SimpleStringSchema, properties)
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
-      person(field(0).toInt, field(1), field(2).toInt)
+      Person(field(0).toInt, field(1), field(2).toInt)
     }).setParallelism(1)
     val table = StreamTableEnv.fromDataStream(stream)
     StreamTableEnv.createTemporaryView("person", table)
     //转为table之后还是要通过sink进行保存
     import org.apache.flink.api.scala._
     val result = StreamTableEnv.sqlQuery("select * from person where id < 100")
-    StreamTableEnv.toAppendStream[person](table).print()
-    StreamTableEnv.toAppendStream[person](result).print()
+    StreamTableEnv.toAppendStream[Person](table).print()
+    StreamTableEnv.toAppendStream[Person](result).print()
     env.execute("stream_table_task")
   }
 }

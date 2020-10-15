@@ -39,10 +39,10 @@ object OperateHdfs {
     val kafkaSource = new FlinkKafkaConsumer(topic, new SimpleStringSchema, properties)
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
-      person(field(0).toInt, field(1), field(2).toInt)
+      Person(field(0).toInt, field(1), field(2).toInt)
     }).setParallelism(1)
     stream.addSink(StreamingFileSink
-      .forRowFormat(new Path("hdfs://192.168.4.110:9000/tmpfile/txt/"), new SimpleStringEncoder[person]("utf-8"))
+      .forRowFormat(new Path("hdfs://192.168.4.110:9000/tmpfile/txt/"), new SimpleStringEncoder[Person]("utf-8"))
       .withRollingPolicy(
       DefaultRollingPolicy.builder()
         .withRolloverInterval(TimeUnit.SECONDS.toSeconds(10)) //10min 生成一个文件

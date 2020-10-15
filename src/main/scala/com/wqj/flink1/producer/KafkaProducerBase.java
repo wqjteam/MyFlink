@@ -27,7 +27,7 @@ public class KafkaProducerBase {
                 producer.send(new ProducerRecord<
                         String, String>(topic, data));
                 System.out.println("输出第" + i + "次");
-                Thread.sleep(50);
+                Thread.sleep(500);
                 i++;
             }
         } catch (Exception e) {

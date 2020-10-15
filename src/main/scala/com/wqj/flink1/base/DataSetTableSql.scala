@@ -6,8 +6,10 @@ import org.apache.flink.streaming.api.scala._
 import org.apache.flink.table.api.{EnvironmentSettings, Table}
 import org.apache.flink.table.api.scala.BatchTableEnvironment
 
+import scala.beans.BeanProperty
 
-case class person(id: Int, name: String, age: Int)
+
+case class Person(@BeanProperty id: Int, @BeanProperty name: String, @BeanProperty age: Int)
 
 object DataSetTableSql {
   def main(args: Array[String]): Unit = {
@@ -19,7 +21,7 @@ object DataSetTableSql {
     import org.apache.flink.api.scala._
     val person_dset = persondata.map(str => {
       val strs: Array[String] = str.split(",")
-      person(strs(0).toInt, strs(1), strs(2).toInt)
+      Person(strs(0).toInt, strs(1), strs(2).toInt)
     })
 
     val table: Table = tableEnv.fromDataSet(person_dset)

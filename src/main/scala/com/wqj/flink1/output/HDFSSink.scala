@@ -3,7 +3,7 @@ package com.wqj.flink1.output
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
-import com.wqj.flink1.base.person
+import com.wqj.flink1.base.Person
 
 import scala.reflect._
 import org.apache.flink.api.common.serialization.SimpleStringEncoder
@@ -17,7 +17,7 @@ class HDFSSink[T](path: String) {
 
   private val filePath = "hdfs://192.168.4.110:9000" + path
   //定义桶
-  private val assigner = new DateTimeBucketAssigner[person]("yyyy-MM-dd--HH", ZoneId.of("Asia/Shanghai"))
+  private val assigner = new DateTimeBucketAssigner[Person]("yyyy-MM-dd--HH", ZoneId.of("Asia/Shanghai"))
   //文件名
   private val config = OutputFileConfig.builder()
     .withPartPrefix("prefix")
@@ -40,7 +40,7 @@ class HDFSSink[T](path: String) {
     //    .withOutputFileConfig()
     .build()
   val sinkParquet = StreamingFileSink.forBulkFormat(new Path(filePath + "/parquet/"),
-    ParquetAvroWriters.forReflectRecord(classOf[person])).withBucketAssigner(assigner).build()
+    ParquetAvroWriters.forReflectRecord(classOf[Person])).withBucketAssigner(assigner).build()
 
 
   // parquet + 压缩

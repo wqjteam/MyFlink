@@ -1,13 +1,13 @@
 package com.wqj.flink1.output
 
-import com.wqj.flink1.base.person
+import com.wqj.flink1.base.Person
 import org.apache.flink.configuration.Configuration
 import org.apache.flink.streaming.api.functions.sink.{RichSinkFunction, SinkFunction}
 import org.apache.hadoop.conf
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.{HBaseConfiguration, HConstants, TableName}
 
-class HbaseSink extends RichSinkFunction[person] {
+class HbaseSink extends RichSinkFunction[Person] {
   //  创建连接
   var conn: Connection = _
   //  创建BufferedMutator
@@ -34,7 +34,7 @@ class HbaseSink extends RichSinkFunction[person] {
 
   }
 
-  override def invoke(value: person, context: SinkFunction.Context[_]): Unit = {
+  override def invoke(value: Person, context: SinkFunction.Context[_]): Unit = {
     val family = "info"
     val put = new Put(value.id.toString.getBytes())
     put.addColumn(family.getBytes(), "name".getBytes(), value.name.getBytes())
