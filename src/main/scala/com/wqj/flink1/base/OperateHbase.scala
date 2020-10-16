@@ -1,31 +1,20 @@
 package com.wqj.flink1.base
 
-import java.lang
 import java.util.Properties
 
 import com.google.gson.Gson
-import com.wqj.flink1.pojo.{PersonJ, RedisBasePojo}
 import com.wqj.flink1.output.{FileProcessWindowFunction, HbaseSink, RedisExampleMapper}
+import com.wqj.flink1.pojo.RedisBasePojo
 import org.apache.flink.api.common.serialization.SimpleStringSchema
-import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
 import org.apache.flink.streaming.connectors.redis.RedisSink
 import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolConfig
-import org.apache.flink.table.api.EnvironmentSettings
-import org.apache.flink.table.api.scala.StreamTableEnvironment
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.table.catalog.hive.HiveCatalog
+import org.apache.flink.table.api.{EnvironmentSettings, SqlDialect, TableEnvironment}
 import org.apache.flink.streaming.api.windowing.time.Time
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow
-import org.apache.flink.util.Collector
-import org.apache.flink.streaming.api.TimeCharacteristic
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
-
-import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
-
+import org.apache.flink.table.api.scala._
+import org.apache.flink.streaming.api.scala._
 
 object OperateHbase {
   private val zk = "flinkmaster:2181"
@@ -35,15 +24,15 @@ object OperateHbase {
 
   def main(args: Array[String]): Unit = {
     import org.apache.flink.api.scala._
-    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
-    val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useOldPlanner().inStreamingMode().build()
-    val tableEnv: StreamTableEnvironment = StreamTableEnvironment.create(env, settings)
-    //    tableEnv.connect(new Kafka().version("0.11").topic("test2").property(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"hadoop102:9092").property("zookeeper.connect","hadoop102:2181")
-    //      .property(ConsumerConfig.GROUP_ID_CONFIG,"ae"))
-    //      .withFormat(new Csv().fieldDelimiter(' '))
-    //      .withSchema(new Schema().field("name",DataTypes.STRING())
-    //        .field("age",DataTypes.INT()))
-    //      .createTemporaryTable("kafkaInputTable")
+
+    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
+    val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build()
+    val tableEnv = StreamTableEnvironment.create(env, settings)
+    val hive = new HiveCatalog("myhive", "study", "D:\\develop_disk\\java\\MyFlink\\src\\main\\resource", "2.3.4")
+    tableEnv.registerCatalog("myhive", hive)
+    tableEnv.useCatalog("myhive")
+    tableEnv.useDatabase("study")
+    tableEnv.getConfig.setSqlDialect(SqlDialect.HIVE)
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
     env.enableCheckpointing(5000)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
@@ -52,26 +41,26 @@ object OperateHbase {
     properties.setProperty("bootstrap.servers", broker)
     properties.setProperty("group.id", group_id)
     //kafka的consumer，test1是要消费的topic
-    import org.apache.flink.api.scala._
+
     val kafkaSource = new FlinkKafkaConsumer(topic, new SimpleStringSchema, properties)
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
       Person(field(0).toInt, field(1), field(2).toInt)
     })
     //      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor)
-    tableEnv.createTemporaryView("person", tableEnv.fromDataStream(stream))
-    val kafkastream = tableEnv.sqlQuery("select * from person")
-    val streamresult = tableEnv.toAppendStream[Person](kafkastream)
+    tableEnv.createTemporaryView("StreamPerson", tableEnv.fromDataStream(stream))
+    val kafkastream = tableEnv.sqlQuery("select * from StreamPerson union select * from study.person")
+    val streamresult = tableEnv.toRetractStream[Person](kafkastream)
 
     /**
       * hbase
       **/
-    //    streamresult.addSink(new HbaseSink).name("hbasesink")
+    streamresult.map(P=>P._2).addSink(new HbaseSink).name("hbasesink")
     /**
       * redis
       **/
-    val redisS = streamresult.map(person => {
-      new RedisBasePojo(person.id.toString, new Gson().toJson(person))
+    val redisS = streamresult.map(P => {
+      new RedisBasePojo(P._2.id.toString, new Gson().toJson(P._2))
     })
 
     val conf = new FlinkJedisPoolConfig.Builder().setHost("flinkmaster").setPort(6379).build()
