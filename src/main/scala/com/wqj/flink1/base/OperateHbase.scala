@@ -21,6 +21,10 @@ object OperateHbase {
   private val broker = "flinkmaster:9092"
   private val group_id = "wc2"
   private val topic = "flink_test"
+  val properties = new Properties()
+  properties.setProperty("zookeeper.connect", zk)
+  properties.setProperty("bootstrap.servers", broker)
+  properties.setProperty("group.id", group_id)
 
   def main(args: Array[String]): Unit = {
     import org.apache.flink.api.scala._
@@ -36,12 +40,7 @@ object OperateHbase {
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
     env.enableCheckpointing(5000)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
-    val properties = new Properties()
-    properties.setProperty("zookeeper.connect", zk)
-    properties.setProperty("bootstrap.servers", broker)
-    properties.setProperty("group.id", group_id)
     //kafka的consumer，test1是要消费的topic
-
     val kafkaSource = new FlinkKafkaConsumer(topic, new SimpleStringSchema, properties)
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
@@ -55,7 +54,7 @@ object OperateHbase {
     /**
       * hbase
       **/
-    streamresult.map(P=>P._2).addSink(new HbaseSink).name("hbasesink")
+    streamresult.map(P => P._2).addSink(new HbaseSink).name("hbasesink")
     /**
       * redis
       **/
@@ -66,9 +65,11 @@ object OperateHbase {
     val conf = new FlinkJedisPoolConfig.Builder().setHost("flinkmaster").setPort(6379).build()
     val redisSink = new RedisSink[RedisBasePojo](conf, new RedisExampleMapper)
     //    redisS.addSink(redisSink).name("redisSink")
+
     /**
-      * hive
-      **/
+      *
+      * 使用window窗口
+      * */
     streamresult.map(pe => {
       new Gson().toJson(pe)
     }).setParallelism(1)
