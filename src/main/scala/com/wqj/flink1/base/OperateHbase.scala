@@ -3,6 +3,7 @@ package com.wqj.flink1.base
 import java.util.Properties
 
 import com.google.gson.Gson
+import com.wqj.flink1.intput.HbaseReader
 import com.wqj.flink1.output.{FileProcessWindowFunction, HbaseSink, RedisExampleMapper}
 import com.wqj.flink1.pojo.RedisBasePojo
 import org.apache.flink.api.common.serialization.SimpleStringSchema
@@ -29,7 +30,7 @@ object OperateHbase {
   def main(args: Array[String]): Unit = {
     import org.apache.flink.api.scala._
 
-    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
+    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
     val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build()
     val tableEnv = StreamTableEnvironment.create(env, settings)
     val hive = new HiveCatalog("myhive", "study", "D:\\develop_disk\\java\\MyFlink\\src\\main\\resource", "2.3.4")
@@ -40,21 +41,39 @@ object OperateHbase {
     env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
     env.enableCheckpointing(5000)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
-    //kafka的consumer，test1是要消费的topic
+
+
+    /**
+      * kafka的consumer，flink_test是要消费的topic
+      **/
     val kafkaSource = new FlinkKafkaConsumer(topic, new SimpleStringSchema, properties)
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
       Person(field(0).toInt, field(1), field(2).toInt)
     })
+    stream.print()
     //      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor)
-    tableEnv.createTemporaryView("StreamPerson", tableEnv.fromDataStream(stream))
-    val kafkastream = tableEnv.sqlQuery("select * from StreamPerson union select * from study.person")
-    val streamresult = tableEnv.toRetractStream[Person](kafkastream)
+    tableEnv.createTemporaryView("StreamPerson", stream)
+    val kafkaAndHive = tableEnv.sqlQuery("select * from StreamPerson union select * from study.person")
+    val streamresult = tableEnv.toRetractStream[Person](kafkaAndHive)
+
+    /**
+      * hbase数据导入
+      **/
+    val hbasesource = env.addSource(new HbaseReader).map(tp => {
+      //      Person(field(0).toInt, field(1), field(2).toInt)
+      new Gson().fromJson(tp._2, classOf[Person])
+    })
+    tableEnv.createTemporaryView("hbasePerson", hbasesource)
+    val hbseAndkafkaResult = tableEnv.sqlQuery("select * from hbasePerson union select * from StreamPerson")
+    tableEnv.toRetractStream[Person](hbseAndkafkaResult).print()
+
 
     /**
       * hbase
       **/
-    streamresult.map(P => P._2).addSink(new HbaseSink).name("hbasesink")
+    //    streamresult.map(P => P._2).addSink(new HbaseSink).name("hbasesink")
+
     /**
       * redis
       **/
@@ -69,11 +88,11 @@ object OperateHbase {
     /**
       *
       * 使用window窗口
-      * */
-    streamresult.map(pe => {
-      new Gson().toJson(pe)
-    }).setParallelism(1)
-      .timeWindowAll(Time.seconds(2)).process(new FileProcessWindowFunction()).name("possessink").print()
+      **/
+    //    streamresult.map(pe => {
+    //      new Gson().toJson(pe)
+    //    }).setParallelism(1)
+    //      .timeWindowAll(Time.seconds(2)).process(new FileProcessWindowFunction()).name("possessink").print()
     env.execute("OperateHbase")
   }
 }
