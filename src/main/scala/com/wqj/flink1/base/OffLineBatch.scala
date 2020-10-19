@@ -23,7 +23,6 @@ object OffLineBatch {
       .map { record=>(record, 1) }
       .groupBy(0)
       .sum(1)
-
     counts.print()
   }
 }

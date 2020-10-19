@@ -1,10 +1,11 @@
 package com.wqj.flink1.base
 
 import java.util.Properties
+import java.util
 
 import com.google.gson.Gson
 import com.wqj.flink1.intput.HbaseReader
-import com.wqj.flink1.output.{FileProcessWindowFunction, HbaseSink, RedisExampleMapper}
+import com.wqj.flink1.output.{ElasticSearchSink, FileProcessWindowFunction, HbaseSink, RedisExampleMapper}
 import com.wqj.flink1.pojo.RedisBasePojo
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
@@ -14,8 +15,11 @@ import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolC
 import org.apache.flink.table.catalog.hive.HiveCatalog
 import org.apache.flink.table.api.{EnvironmentSettings, SqlDialect, TableEnvironment}
 import org.apache.flink.streaming.api.windowing.time.Time
+import org.apache.http.HttpHost
+import org.apache.flink.streaming.api.functions.sink.RichSinkFunction
 import org.apache.flink.table.api.scala._
 import org.apache.flink.streaming.api.scala._
+import org.apache.flink.streaming.connectors.elasticsearch6.ElasticsearchSink
 
 object OperateHbase {
   private val zk = "flinkmaster:2181"
@@ -66,8 +70,8 @@ object OperateHbase {
     })
     tableEnv.createTemporaryView("hbasePerson", hbasesource)
     val hbseAndkafkaResult = tableEnv.sqlQuery("select * from hbasePerson union select * from StreamPerson")
-    tableEnv.toRetractStream[Person](hbseAndkafkaResult).print()
-
+    val adkkr = tableEnv.toRetractStream[Person](hbseAndkafkaResult)
+    adkkr.print()
 
     /**
       * hbase
@@ -84,6 +88,11 @@ object OperateHbase {
     val conf = new FlinkJedisPoolConfig.Builder().setHost("flinkmaster").setPort(6379).build()
     val redisSink = new RedisSink[RedisBasePojo](conf, new RedisExampleMapper)
     //    redisS.addSink(redisSink).name("redisSink")
+
+    val httpHosts = new util.ArrayList[HttpHost]()
+    httpHosts.add(new HttpHost("localhost", 9200))
+//    val esSinkBuild = new ElasticsearchSink.Builder[Person](httpHosts, new ElasticSearchSink())
+//    adkkr.map(x => x._2).addSink(esSinkBuild.build())
 
     /**
       *
