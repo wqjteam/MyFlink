@@ -26,5 +26,7 @@ object ScalaHttp {
     val accessToken = Http("https://api.twitter.com/oauth/access_token").postForm.oauth(consumer, response.body, verifier).asToken
 
     println(Http("https://api.twitter.com/1.1/account/settings.json").oauth(consumer, accessToken.body).asString)
+    val response2 = Http("https://api.twitter.com/1.1/account/settings.json").oauth(consumer, accessToken.body).asString
+    response2
   }
 }
