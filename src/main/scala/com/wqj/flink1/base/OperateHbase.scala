@@ -103,5 +103,6 @@ object OperateHbase {
     //    }).setParallelism(1)
     //      .timeWindowAll(Time.seconds(2)).process(new FileProcessWindowFunction()).name("possessink").print()
     env.execute("OperateHbase")
+
   }
 }

@@ -16,6 +16,8 @@
         <mysqlconnect.version>5.1.38</mysqlconnect.version>
         <hdfs.version>2.7.7</hdfs.version>
         <hbase.version>2.2.5</hbase.version>
+        <scalaj.version>2.4.2</scalaj.version>
+
     </properties>
 
 
@@ -97,15 +99,11 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysqlconnect.version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.apache.bahir</groupId>
             <artifactId>flink-connector-redis_${scala.version}</artifactId>
             <version>1.0</version>
         </dependency>
-
-
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -142,6 +140,17 @@
             <groupId>org.apache.hbase</groupId>
             <artifactId>hbase-server</artifactId>
             <version>${hbase.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-elasticsearch6_${scala.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.scalaj/scalaj-http -->
+        <dependency>
+            <groupId>org.scalaj</groupId>
+            <artifactId>scalaj-http_${scala.version}</artifactId>
+            <version>${scalaj.version}</version>
         </dependency>
 
     </dependencies>
