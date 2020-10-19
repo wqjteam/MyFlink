@@ -1,5 +1,6 @@
 package com.wqj.flink1.base
 
+import java.text.SimpleDateFormat
 import java.util.Properties
 import java.util
 
@@ -17,6 +18,7 @@ import org.apache.flink.table.api.{EnvironmentSettings, SqlDialect, TableEnviron
 import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.http.HttpHost
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction
+import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor
 import org.apache.flink.table.api.scala._
 import org.apache.flink.streaming.api.scala._
 import org.apache.flink.streaming.connectors.elasticsearch6.ElasticsearchSink
@@ -32,6 +34,7 @@ object OperateHbase {
   properties.setProperty("group.id", group_id)
 
   def main(args: Array[String]): Unit = {
+
     import org.apache.flink.api.scala._
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
@@ -42,7 +45,7 @@ object OperateHbase {
     tableEnv.useCatalog("myhive")
     tableEnv.useDatabase("study")
     tableEnv.getConfig.setSqlDialect(SqlDialect.HIVE)
-    env.setStreamTimeCharacteristic(TimeCharacteristic.ProcessingTime)
+    env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime)
     env.enableCheckpointing(5000)
     env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
 
@@ -55,8 +58,16 @@ object OperateHbase {
       val field = x.split(",")
       Person(field(0).toInt, field(1), field(2).toInt)
     })
-    stream.print()
-    //      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor)
+      //解决数据乱序到达的问题
+//      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[Person](Time.milliseconds(50)) {
+//      override def extractTimestamp(element: Person): Long = {
+//        val sdf = new SimpleDateFormat()
+//        //              println("want watermark : " + sdf.parse(element.createTime).getTime)
+//        //              sdf.parse(element.createTime).getTime
+//          从数据中获取数据设置eventtime
+//        100000l
+//      }
+//    })
     tableEnv.createTemporaryView("StreamPerson", stream)
     val kafkaAndHive = tableEnv.sqlQuery("select * from StreamPerson union select * from study.person")
     val streamresult = tableEnv.toRetractStream[Person](kafkaAndHive)
@@ -91,17 +102,29 @@ object OperateHbase {
 
     val httpHosts = new util.ArrayList[HttpHost]()
     httpHosts.add(new HttpHost("localhost", 9200))
-//    val esSinkBuild = new ElasticsearchSink.Builder[Person](httpHosts, new ElasticSearchSink())
-//    adkkr.map(x => x._2).addSink(esSinkBuild.build())
+    //    val esSinkBuild = new ElasticsearchSink.Builder[Person](httpHosts, new ElasticSearchSink())
+    //    adkkr.map(x => x._2).addSink(esSinkBuild.build())
 
     /**
       *
       * 使用window窗口
       **/
-    //    streamresult.map(pe => {
-    //      new Gson().toJson(pe)
-    //    }).setParallelism(1)
-    //      .timeWindowAll(Time.seconds(2)).process(new FileProcessWindowFunction()).name("possessink").print()
+    streamresult.map(pe => {
+      new Gson().toJson(pe)
+    }).setParallelism(1)
+      .timeWindowAll(Time.seconds(2))
+      /**
+        * allowedLateness 用来控制窗口的销毁时间，解决窗口触发后数据迟到后的问题
+        * 默认情况下，当watermark通过end-of-window激活window计算结束之后，再有之前的数据到达时，这些数据会被删除。
+        * 为了避免有些迟到的数据被删除，因此产生了allowedLateness，使用allowedLateness延迟销毁窗口，
+        * 允许有一段时间（也是以event time来衡量）来等待之前的数据到达，以便再次处理这些数据
+        *
+        * 同时还有网络等原因数据延迟造成 allowedLateness解决不了可以用getSideOutput(outputTag)解决
+        * */
+
+//    .allowedLateness(Time.seconds(2))
+      //      .sideOutputLateData("")
+    .process(new FileProcessWindowFunction()).name("possessink").print()
     env.execute("OperateHbase")
 
   }
