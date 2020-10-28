@@ -5,7 +5,6 @@ import java.util.List
 
 import com.google.gson.Gson
 import com.wqj.flink1.base.Person
-import com.wqj.flink1.pojo.PersonJ
 import org.apache.flink.streaming.api.scala.function.ProcessAllWindowFunction
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
