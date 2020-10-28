@@ -8,6 +8,7 @@ import com.google.gson.Gson
 import com.wqj.flink1.intput.HbaseReader
 import com.wqj.flink1.output.{ElasticSearchSink, FileProcessWindowFunction, HbaseSink, RedisExampleMapper}
 import com.wqj.flink1.pojo.RedisBasePojo
+import com.wqj.flink1.utils.FileUtil
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
@@ -37,10 +38,10 @@ object OperateHbase {
 
     import org.apache.flink.api.scala._
 
-    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
+    val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     val settings: EnvironmentSettings = EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build()
     val tableEnv = StreamTableEnvironment.create(env, settings)
-    val hive = new HiveCatalog("myhive", "study", "D:\\develop_disk\\java\\MyFlink\\src\\main\\resource", "2.3.4")
+    val hive = new HiveCatalog("myhive", "study", FileUtil.getHadoopConf(), "2.3.4")
     tableEnv.registerCatalog("myhive", hive)
     tableEnv.useCatalog("myhive")
     tableEnv.useDatabase("study")
@@ -58,20 +59,20 @@ object OperateHbase {
       val field = x.split(",")
       Person(field(0).toInt, field(1), field(2).toInt)
     })
-      //解决数据乱序到达的问题
-//      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[Person](Time.milliseconds(50)) {
-//      override def extractTimestamp(element: Person): Long = {
-//        val sdf = new SimpleDateFormat()
-//        //              println("want watermark : " + sdf.parse(element.createTime).getTime)
-//        //              sdf.parse(element.createTime).getTime
-//          从数据中获取数据设置eventtime
-//        100000l
-//      }
-//    })
+    //解决数据乱序到达的问题
+    //      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[Person](Time.milliseconds(50)) {
+    //      override def extractTimestamp(element: Person): Long = {
+    //        val sdf = new SimpleDateFormat()
+    //        //              println("want watermark : " + sdf.parse(element.createTime).getTime)
+    //        //              sdf.parse(element.createTime).getTime
+    //          从数据中获取数据设置eventtime
+    //        100000l
+    //      }
+    //    })
     tableEnv.createTemporaryView("StreamPerson", stream)
     val kafkaAndHive = tableEnv.sqlQuery("select * from StreamPerson union select * from study.person")
     val streamresult = tableEnv.toRetractStream[Person](kafkaAndHive)
-
+    streamresult.print()
     /**
       * hbase数据导入
       **/
@@ -87,7 +88,7 @@ object OperateHbase {
     /**
       * hbase
       **/
-    //    streamresult.map(P => P._2).addSink(new HbaseSink).name("hbasesink")
+    streamresult.map(P => P._2).addSink(new HbaseSink).name("hbasesink")
 
     /**
       * redis
@@ -98,7 +99,7 @@ object OperateHbase {
 
     val conf = new FlinkJedisPoolConfig.Builder().setHost("flinkmaster").setPort(6379).build()
     val redisSink = new RedisSink[RedisBasePojo](conf, new RedisExampleMapper)
-    //    redisS.addSink(redisSink).name("redisSink")
+    redisS.addSink(redisSink).name("redisSink")
 
     val httpHosts = new util.ArrayList[HttpHost]()
     httpHosts.add(new HttpHost("localhost", 9200))
@@ -113,18 +114,19 @@ object OperateHbase {
       new Gson().toJson(pe)
     }).setParallelism(1)
       .timeWindowAll(Time.seconds(2))
-      /**
-        * allowedLateness 用来控制窗口的销毁时间，解决窗口触发后数据迟到后的问题
-        * 默认情况下，当watermark通过end-of-window激活window计算结束之后，再有之前的数据到达时，这些数据会被删除。
-        * 为了避免有些迟到的数据被删除，因此产生了allowedLateness，使用allowedLateness延迟销毁窗口，
-        * 允许有一段时间（也是以event time来衡量）来等待之前的数据到达，以便再次处理这些数据
-        *
-        * 同时还有网络等原因数据延迟造成 allowedLateness解决不了可以用getSideOutput(outputTag)解决
-        * */
 
-//    .allowedLateness(Time.seconds(2))
-      //      .sideOutputLateData("")
-    .process(new FileProcessWindowFunction()).name("possessink").print()
+    /**
+      * allowedLateness 用来控制窗口的销毁时间，解决窗口触发后数据迟到后的问题
+      * 默认情况下，当watermark通过end-of-window激活window计算结束之后，再有之前的数据到达时，这些数据会被删除。
+      * 为了避免有些迟到的数据被删除，因此产生了allowedLateness，使用allowedLateness延迟销毁窗口，
+      * 允许有一段时间（也是以event time来衡量）来等待之前的数据到达，以便再次处理这些数据
+      *
+      * 同时还有网络等原因数据延迟造成 allowedLateness解决不了可以用getSideOutput(outputTag)解决
+      **/
+
+//      .allowedLateness(Time.seconds(2))
+//      .sideOutputLateData("")
+//      .process(new FileProcessWindowFunction()).name("possessink").print()
     env.execute("OperateHbase")
 
   }

@@ -53,10 +53,10 @@
             <version>${flink.version}</version>
         </dependency>
         <!--<dependency>-->
-            <!--<groupId>org.apache.flink</groupId>-->
-            <!--<artifactId>flink-shaded-hadoop-2-uber</artifactId>-->
-            <!--<version>2.6.5-8.0</version>-->
-            <!--<scope>provided</scope>-->
+        <!--<groupId>org.apache.flink</groupId>-->
+        <!--<artifactId>flink-shaded-hadoop-2-uber</artifactId>-->
+        <!--<version>2.6.5-8.0</version>-->
+        <!--<scope>provided</scope>-->
         <!--</dependency>-->
         <dependency>
             <groupId>org.apache.flink</groupId>
@@ -156,100 +156,29 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>net.alchim31.maven</groupId>
-                    <artifactId>scala-maven-plugin</artifactId>
-                    <version>3.2.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.7.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.0.2</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <!--<version>3.7.0</version>-->
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>net.alchim31.maven</groupId>
                 <artifactId>scala-maven-plugin</artifactId>
+                <version>3.2.2</version>
+                <configuration>
+                    <recompileMode>incremental</recompileMode>
+                </configuration>
                 <executions>
                     <execution>
-                        <id>scala-compile-first</id>
-                        <phase>process-resources</phase>
                         <goals>
-                            <goal>add-source</goal>
                             <goal>compile</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>scala-test-compile</id>
-                        <phase>process-test-resources</phase>
-                        <goals>
                             <goal>testCompile</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <!-- 输出目录 -->
-                            <outputDirectory>${project.build.outputDirectory}/keystore</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <!-- 资源目录 -->
-                                    <directory>${project.basedir}/keystore</directory>
-                                    <includes>
-                                        <include>**/*.jks</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-                <!--<configuration>-->
-                <!--<nonFilteredFileExtensions>-->
-                <!--<nonFilteredFileExtension>pdf</nonFilteredFileExtension>-->
-                <!--<nonFilteredFileExtension>swf</nonFilteredFileExtension>-->
-                <!--<nonFilteredFileExtension>data</nonFilteredFileExtension>-->
-                <!--</nonFilteredFileExtensions>-->
-                <!--</configuration>-->
-            </plugin>
-
-
         </plugins>
     </build>
 
