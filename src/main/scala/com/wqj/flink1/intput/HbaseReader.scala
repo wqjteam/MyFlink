@@ -40,26 +40,33 @@ class HbaseReader extends RichSourceFunction[(String, String)] {
   override def run(ctx: SourceFunction.SourceContext[(String, String)]): Unit = {
 
     //    scan.setFilter(new Filter())
-    val rs = table.getScanner(scan)
+    while (true) {
+      val rs = table.getScanner(scan)
 
-    val iterator = rs.iterator()
-    while (iterator.hasNext) {
-      val result = iterator.next()
-      val json = new JsonObject()
-      json.addProperty("id", Bytes.toString(result.getRow))
-      val rowKey = Bytes.toString(result.getRow)
-      val sb: StringBuffer = new StringBuffer()
-      for (cell: Cell <- result.listCells().asScala) {
-        val property = Bytes.toString(cell.getQualifierArray, cell.getQualifierOffset, cell.getQualifierLength)
-        val value = Bytes.toString(cell.getValueArray, cell.getValueOffset, cell.getValueLength)
-        json.addProperty(property, value)
+      val iterator = rs.iterator()
+      while (iterator.hasNext) {
+        val result = iterator.next()
+        val json = new JsonObject()
+        json.addProperty("id", Bytes.toString(result.getRow))
+        val rowKey = Bytes.toString(result.getRow)
+        val sb: StringBuffer = new StringBuffer()
+        for (cell: Cell <- result.listCells().asScala) {
+          val property = Bytes.toString(cell.getQualifierArray, cell.getQualifierOffset, cell.getQualifierLength)
+          val value = Bytes.toString(cell.getValueArray, cell.getValueOffset, cell.getValueLength)
+          json.addProperty(property, value)
+        }
+        ctx.collect((rowKey, json.toString))
       }
-      ctx.collect((rowKey, json.toString))
+      Thread.sleep(50000)
     }
   }
 
   override def cancel(): Unit = {
-    table.close()
-    conn.close()
+    if (table != null) {
+      table.close()
+    }
+    if (conn != null) {
+      conn.close()
+    }
   }
 }

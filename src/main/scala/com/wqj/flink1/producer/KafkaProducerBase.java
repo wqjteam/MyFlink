@@ -22,7 +22,7 @@ public class KafkaProducerBase {
         try {
             int i = 0;
 
-            while (i < 2000) {
+            while (i < 1) {
                 data = ((int) (Math.random() * 10000)) + ",zs,"+((int) (Math.random() * 10000));
                 producer.send(new ProducerRecord<
                         String, String>(topic, data));
