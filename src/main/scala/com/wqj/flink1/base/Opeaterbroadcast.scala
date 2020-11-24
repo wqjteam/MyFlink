@@ -4,12 +4,12 @@ import java.util.Properties
 
 import com.google.gson.Gson
 import com.wqj.flink1.intput.HbaseReader
-import com.wqj.flink1.output.HbaseProcessFunction
+import com.wqj.flink1.output.HbaseBroadCastProcessFunction
 import com.wqj.flink1.utils.FileUtil
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.api.common.state.MapStateDescriptor
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
+import org.apache.flink.streaming.connectors.kafka.{FlinkKafkaConsumer, FlinkKafkaProducer}
 import org.apache.flink.table.api.{EnvironmentSettings, SqlDialect}
 import org.apache.flink.table.catalog.hive.HiveCatalog
 
@@ -73,7 +73,7 @@ object Opeaterbroadcast {
 
 
     //把hbase的历史数据和新来的数据做合并
-    val MergeStream = stream.connect(hbasebroadcast).process(new HbaseProcessFunction)
+    val MergeStream = stream.connect(hbasebroadcast).process(new HbaseBroadCastProcessFunction).map(x=>x.toString).addSink(new FlinkKafkaProducer[String]("localhost:9092","flinktest3",new SimpleStringSchema()))
     env.execute("Opeaterbroadcast")
   }
 }

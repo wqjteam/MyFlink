@@ -7,7 +7,7 @@ import org.apache.flink.util.Collector
 
 import scala.collection.mutable.ArrayBuffer
 
-class HbaseProcessFunction extends BroadcastProcessFunction[Person, Person, Person] {
+class HbaseBroadCastProcessFunction extends BroadcastProcessFunction[Person, Person, Person] {
   var processMark = 0
   //广播状态描述符,广播流只支持MapState的结构,支持吃kv
   val broadcasteStateDescriptor = new MapStateDescriptor[String, Person]("broadcasteStateDescriptor", classOf[String], classOf[Person])
