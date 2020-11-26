@@ -59,16 +59,19 @@ object OperateHbase {
       val field = x.split(",")
       Person(field(0).toInt, field(1), field(2).toInt)
     })
-    //解决数据乱序到达的问题
-    //      .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[Person](Time.milliseconds(50)) {
-    //      override def extractTimestamp(element: Person): Long = {
-    //        val sdf = new SimpleDateFormat()
-    //        //              println("want watermark : " + sdf.parse(element.createTime).getTime)
-    //        //              sdf.parse(element.createTime).getTime
-    //          从数据中获取数据设置eventtime
-    //        100000l
-    //      }
-    //    })
+
+    /**
+      * //解决数据乱序到达的问题,(数据同时生成,到达的时间却不同,会影响window窗口统计的判断) ,同时最大延时统计是5000ms
+      * 如果不加延时统计,可能你数据到了,窗口的计算却完成了,所以才加的延时统计(allowedLateness)也可以有同样的效果
+      * .assignTimestampsAndWatermarks(new BoundedOutOfOrdernessTimestampExtractor[Person](Time.milliseconds(50)) {
+      * override def extractTimestamp(element: Person): Long = {
+      * val sdf = new SimpleDateFormat()
+      * //              println("want watermark : " + sdf.parse(element.createTime).getTime)
+      * //              sdf.parse(element.createTime).getTime
+      * //              从数据中获取数据设置eventtime
+      * 100000l
+      * }
+      * }) */
     tableEnv.createTemporaryView("StreamPerson", stream)
     val kafkaAndHive = tableEnv.sqlQuery("select * from StreamPerson union select * from study.person")
     val streamresult = tableEnv.toRetractStream[Person](kafkaAndHive)
@@ -124,9 +127,9 @@ object OperateHbase {
       * 同时还有网络等原因数据延迟造成 allowedLateness解决不了可以用getSideOutput(outputTag)解决
       **/
 
-//      .allowedLateness(Time.seconds(2))
-//      .sideOutputLateData("")
-//      .process(new FileProcessWindowFunction()).name("possessink").print()
+    //      .allowedLateness(Time.seconds(2))
+    //      .sideOutputLateData("")
+    //      .process(new FileProcessWindowFunction()).name("possessink").print()
     env.execute("OperateHbase")
 
   }
