@@ -40,7 +40,7 @@ class HbaseReader extends RichSourceFunction[(String, String)] {
   override def run(ctx: SourceFunction.SourceContext[(String, String)]): Unit = {
 
     //    scan.setFilter(new Filter())
-    while (true) {
+//    while (true) {
       val rs = table.getScanner(scan)
 
       val iterator = rs.iterator()
@@ -57,8 +57,8 @@ class HbaseReader extends RichSourceFunction[(String, String)] {
         }
         ctx.collect((rowKey, json.toString))
       }
-      Thread.sleep(50000)
-    }
+//      Thread.sleep(50000)
+//    }
   }
 
   override def cancel(): Unit = {
