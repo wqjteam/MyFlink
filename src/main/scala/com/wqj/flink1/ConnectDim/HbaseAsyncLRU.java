@@ -1,4 +1,4 @@
-package com.wqj.flink1.AsyncDim;
+package com.wqj.flink1.ConnectDim;
 
 import com.google.common.cache.CacheBuilder;
 import org.apache.flink.configuration.Configuration;

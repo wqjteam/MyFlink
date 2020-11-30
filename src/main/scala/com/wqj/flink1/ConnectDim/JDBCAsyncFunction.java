@@ -1,4 +1,4 @@
-package com.wqj.flink1.AsyncDim;
+package com.wqj.flink1.ConnectDim;
 
 
 import io.vertx.core.Vertx;
