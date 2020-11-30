@@ -25,7 +25,7 @@ public class JDBCAsyncFunction extends RichAsyncFunction<String, String> {
                 .setEventLoopPoolSize(10));
 
         JsonObject config = new JsonObject()
-                .put("url", "jdbc:mysql://xx:3306/base")
+                .put("url", "jdbc:mysql://192.168.4.110:3306/flink_test")
                 .put("driver_class", "com.mysql.cj.jdbc.Driver")
                 .put("max_pool_size", 10)
                 .put("user", "x")
@@ -33,7 +33,6 @@ public class JDBCAsyncFunction extends RichAsyncFunction<String, String> {
 
         client = JDBCClient.createShared(vertx, config);
     }
-
 
 
     @Override
@@ -44,7 +43,7 @@ public class JDBCAsyncFunction extends RichAsyncFunction<String, String> {
             }
 
             final SQLConnection connection = conn.result();
-            connection.query("select id, name from t where id = " + input, res2 -> {
+            connection.query("select id, name from person where id = " + input, res2 -> {
                 ResultSet rs = new ResultSet();
                 if (res2.succeeded()) {
                     rs = res2.result();

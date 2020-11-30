@@ -1,21 +1,18 @@
 package com.wqj.flink1.base
 
-import java.sql.{Connection, DriverManager}
 import java.util.Properties
 
-import com.wqj.flink1.ConnectDim.JDBCDimSync
-import com.wqj.flink1.base.OperateHbase.{properties, topic}
-import com.wqj.flink1.utils.FileUtil
-import org.apache.flink.api.common.functions.RichMapFunction
+import com.google.gson.Gson
+import com.wqj.flink1.ConnectDim._
 import org.apache.flink.api.common.serialization.SimpleStringSchema
-import org.apache.flink.configuration.Configuration
+import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
-import org.apache.flink.table.api.{EnvironmentSettings, SqlDialect}
-import org.apache.flink.table.api.scala.StreamTableEnvironment
-import org.apache.flink.table.catalog.hive.HiveCatalog
-import org.apache.flink.streaming.api.scala._
+import org.apache.flink.table.api.EnvironmentSettings
+
+
+
+
 
 object OpeaterDim {
   private val zk = "flinkmaster:2181"
@@ -28,7 +25,6 @@ object OpeaterDim {
   properties.setProperty("group.id", group_id)
 
   def main(args: Array[String]): Unit = {
-    import org.apache.flink.table.api.scala._
     import org.apache.flink.api.scala._
 
     val env: StreamExecutionEnvironment = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
@@ -51,10 +47,8 @@ object OpeaterDim {
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
       Person(field(0).toInt, field(1), field(2).toInt)
-    })
-      .map(new JDBCDimSync)
-
-      .print()
+    }).map(new JDBCSyncMapFunction).map(new Gson().toJson(_))
+    AsyncDataStream.unorderedWait(stream,new HbaseAsyncLRU_scala,1000,java.util.concurrent.TimeUnit.MICROSECONDS).print()
 
     env.execute("OpeaterDim")
   }

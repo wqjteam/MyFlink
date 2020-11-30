@@ -6,7 +6,7 @@ import com.wqj.flink1.base.Person
 import org.apache.flink.api.common.functions.RichMapFunction
 import org.apache.flink.configuration.Configuration
 
-class JDBCDimSync extends RichMapFunction[Person, Person] {
+class JDBCSyncMapFunction extends RichMapFunction[Person, Person] {
   var conn: Connection = null
 
   override def open(parameters: Configuration): Unit = {

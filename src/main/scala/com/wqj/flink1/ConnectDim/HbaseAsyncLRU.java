@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HbaseAsyncLRU extends RichAsyncFunction<String, String> {
 
-    String table = "info";
+    String table = "person";
     Cache<String, String> cache = null;
     private HBaseClient client = null;
 
@@ -50,16 +50,17 @@ public class HbaseAsyncLRU extends RichAsyncFunction<String, String> {
         } else {
             //如果缓存获取失败再从hbase获取维度数据
             client.get(new GetRequest(table, String.valueOf(id)))
-                    .addCallback((Callback<String, ArrayList<KeyValue>>) arg -> {
-                        for (KeyValue kv : arg) {
-                            //kv.value()应该不止一列数据,有很多的数据
-                            String value = new String(kv.value());
-                            jo.addProperty("name", value);
-                            resultFuture.complete(Collections.singleton(jo.toString()));
-                            cache.put(String.valueOf(id), value);
-                        }
-                        return null;
-                    });
+                    .addCallback((Callback<String, ArrayList<KeyValue>>)
+                            arg -> {
+                                for (KeyValue kv : arg) {
+                                    //kv.value()应该不止一列数据,有很多的数据
+                                    String value = new String(kv.value());
+                                    jo.addProperty("name", value);
+                                    resultFuture.complete(Collections.singleton(jo.toString()));
+                                    cache.put(String.valueOf(id), value);
+                                }
+                                return null;
+                            });
         }
     }
 
