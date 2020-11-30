@@ -40,12 +40,13 @@ class HbaseAsyncLRU_scala extends RichAsyncFunction[String, String] {
             resultFuture.complete(Collections.singleton(jo.toString))
             cache.put(String.valueOf(id), value)
           })
-        }
 
-        return null
+
+          return null
+        }
       }
+      )
     }
-    )
   }
 
   override def timeout(input: String, resultFuture: ResultFuture[String]): Unit = {
