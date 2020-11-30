@@ -1,4 +1,4 @@
-package com.wqj.flink1.ConnectDim
+package com.wqj.flink1.connectDim
 
 import java.util
 import java.util.{ArrayList, Collections}

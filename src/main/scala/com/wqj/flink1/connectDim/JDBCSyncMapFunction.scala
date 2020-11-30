@@ -1,4 +1,4 @@
-package com.wqj.flink1.ConnectDim
+package com.wqj.flink1.connectDim
 
 import java.sql.{Connection, DriverManager}
 

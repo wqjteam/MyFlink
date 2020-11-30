@@ -1,4 +1,4 @@
-package com.wqj.flink1.ConnectDim;
+package com.wqj.flink1.connectDim;
 
 
 import com.google.common.cache.Cache;
