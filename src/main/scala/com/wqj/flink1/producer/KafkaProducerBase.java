@@ -17,12 +17,12 @@ public class KafkaProducerBase {
 
         String data = ",zs,";
 //        data = "li,zs,ww";
-        String topic = "flink_test";
+        String topic = "flink_dim";
 //        topic = "flink_test_student";
         try {
             int i = 0;
 
-            while (i < 1) {
+            while (i < 100) {
                 data = ((int) (Math.random() * 10000)) + ",zs,"+((int) (Math.random() * 10000));
                 producer.send(new ProducerRecord<
                         String, String>(topic, data));

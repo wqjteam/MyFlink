@@ -154,6 +154,18 @@
             <version>${hbase.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.hbase</groupId>
+            <artifactId>asynchbase</artifactId>
+            <version>1.8.2</version>
+        </dependency>
+
+        <!--<dependency>-->
+            <!--<groupId>com.google.guava</groupId>-->
+            <!--<artifactId>guava</artifactId>-->
+            <!--<version>29.0-jre</version>-->
+        <!--</dependency>-->
+
+        <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-elasticsearch6_${scala.version}</artifactId>
             <version>${flink.version}</version>

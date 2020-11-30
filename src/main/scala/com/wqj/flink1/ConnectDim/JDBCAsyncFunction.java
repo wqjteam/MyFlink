@@ -34,10 +34,7 @@ public class JDBCAsyncFunction extends RichAsyncFunction<String, String> {
         client = JDBCClient.createShared(vertx, config);
     }
 
-    @Override
-    public void close() throws Exception {
-        client.close();
-    }
+
 
     @Override
     public void asyncInvoke(String input, ResultFuture<String> resultFuture) throws Exception {
@@ -64,5 +61,17 @@ public class JDBCAsyncFunction extends RichAsyncFunction<String, String> {
                 resultFuture.complete(stores);
             });
         });
+    }
+
+    @Override
+    public void timeout(String input, ResultFuture<String> resultFuture) throws Exception {
+        List<String> list = new ArrayList();
+        list.add(input);
+        resultFuture.complete(list);
+    }
+
+    @Override
+    public void close() throws Exception {
+        client.close();
     }
 }
