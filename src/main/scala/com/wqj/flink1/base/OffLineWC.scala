@@ -43,7 +43,7 @@ object OffLineWC {
       })
 
     })
-    lastsink
+    env.execute("OffLineWC")
 //      .print()
   }
 }
