@@ -3,7 +3,7 @@ package com.wqj.flink1.base
 import java.util.Properties
 
 import com.google.gson.Gson
-import com.wqj.flink1.ConnectDim._
+import com.wqj.flink1.connectDim._
 import org.apache.flink.api.common.serialization.SimpleStringSchema
 import org.apache.flink.streaming.api.scala.{StreamExecutionEnvironment, _}
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
