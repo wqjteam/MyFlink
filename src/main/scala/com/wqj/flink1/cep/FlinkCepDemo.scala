@@ -40,7 +40,7 @@ object FlinkCepDemo {
   private val zk = "flinkmaster:2181"
   private val broker = "flinkmaster:9092"
   private val group_id = "DSTS2"
-  private val topic = "flink_test"
+  private val topic = "warning_test"
 
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
