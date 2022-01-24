@@ -24,6 +24,7 @@ import org.apache.flink.util.Collector
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.dws.ToDwsCustomerMinteOrdersKafkaAggrDS /sh/包名.jar yarn
 
 //将dwd数据进行聚合，发送到kafka（dws）
+//后面 flink 的建表语句都可以保存在hive的元数据中
 object ToDwsCustomerMinteOrdersKafkaAggrDS {
 
 

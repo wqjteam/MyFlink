@@ -10,6 +10,7 @@ import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.ads.ToAdsConsumptionAmountEveryhour /sh/包名.jar yarn
 //每小时销售额
+//后面 flink 的建表语句都可以保存在hive的元数据中
 object ToAdsConsumptionAmountEveryhour {
 
   def main(args: Array[String]): Unit = {

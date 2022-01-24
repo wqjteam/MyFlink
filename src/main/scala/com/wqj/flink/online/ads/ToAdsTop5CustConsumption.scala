@@ -25,7 +25,7 @@ import scala.collection.mutable.ListBuffer
 // flink run –m yarn-cluster -c 全类名 .jar
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.ads.ToAdsTop5CustConsumption /sh/包名.jar yarn
 //统计消费额前5的用户
-
+//后面 flink 的建表语句都可以保存在hive的元数据中
 object ToAdsTop5CustConsumption {
 
   def main(args: Array[String]): Unit = {

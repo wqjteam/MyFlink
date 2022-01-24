@@ -17,7 +17,7 @@ import org.apache.flink.types.Row
 
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.ads.ToAdsTop5MidContry /sh/包名.jar yarn
 //消费额中位数前5的国家
-
+//后面 flink 的建表语句都可以保存在hive的元数据中
 import org.apache.flink.streaming.connectors.redis.common.config.FlinkJedisPoolConfig
 
 object ToAdsTop5MidContry {

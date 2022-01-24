@@ -11,6 +11,7 @@ import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.ads.ToAdsOrderedAmountEveryminute /sh/包名.jar yarn
 //每分钟订单量
+//后面 flink 的建表语句都可以保存在hive的元数据中
 object ToAdsOrderedAmountEveryminute {
 
   def main(args: Array[String]): Unit = {

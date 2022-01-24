@@ -22,6 +22,7 @@ import scala.util.Random
 //nohup ./to_make_socket_data_v2 >/opt/module/flume-1.9.0/logs/socket.log &
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.dwd.ToDWdAndHbaseStream /sh/provincecontest-1.0-SNAPSHOT.jar yarn
 //获取到流之后 将数据拆解为order和lienitem两部分 order数据落入kafka（dwd），在复制一份到hbase中，lineitem直接落入到hbase中
+//后面 flink 的建表语句都可以保存在hive的元数据中
 case class Orders(row_key: String,
                   orderkey: String,
                   custkey: String,
