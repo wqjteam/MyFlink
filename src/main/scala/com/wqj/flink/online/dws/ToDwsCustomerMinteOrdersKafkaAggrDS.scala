@@ -23,7 +23,7 @@ import org.apache.flink.util.Collector
 
 //flink run -m yarn-cluster -p 2 -yjm 2G -ytm 2G -yn -c com.shtd.dw.online.dws.ToDwsCustomerMinteOrdersKafkaAggrDS /sh/包名.jar yarn
 
-
+//将dwd数据进行聚合，发送到kafka（dws）
 object ToDwsCustomerMinteOrdersKafkaAggrDS {
 
 
