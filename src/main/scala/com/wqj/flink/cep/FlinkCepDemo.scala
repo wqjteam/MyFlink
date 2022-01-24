@@ -3,21 +3,17 @@ package com.wqj.flink.cep
 import java.util
 import java.util.Properties
 
-import com.wqj.flink.base.DataStreamTableSql.{broker, group_id, topic, zk}
 import org.apache.flink.api.common.serialization.{SimpleStringEncoder, SimpleStringSchema}
-import org.apache.flink.cep.scala.CEP
-import org.apache.flink.cep.scala.pattern.Pattern
-import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment}
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
-import org.apache.flink.table.api.EnvironmentSettings
-import org.apache.flink.table.api.scala.StreamTableEnvironment
 import org.apache.flink.api.scala._
 import org.apache.flink.cep.PatternSelectFunction
-import org.apache.flink.cep.functions.PatternProcessFunction
+import org.apache.flink.cep.scala.CEP
+import org.apache.flink.cep.scala.pattern.Pattern
 import org.apache.flink.core.fs.Path
 import org.apache.flink.streaming.api.functions.sink.filesystem.StreamingFileSink
-import org.apache.flink.util.Collector
+import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer
+import org.apache.flink.table.api.EnvironmentSettings
 //cep的使用demo
 
 // 定义样例类，Event用来存放输入数据，Warning存放输出数据

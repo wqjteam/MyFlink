@@ -19,7 +19,7 @@ object DataStreamTableSql {
   private val topic = "flink_test"
 
   def main(args: Array[String]): Unit = {
-    lazy val logger = Logger.getLogger(WcKafka.getClass)
+//    lazy val logger = Logger.getLogger(WcKafka.getClass)
     val env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI()
     val properties = new Properties()
     properties.setProperty("zookeeper.connect", zk)
@@ -33,7 +33,7 @@ object DataStreamTableSql {
     val kafkaSource = new FlinkKafkaConsumer(topic, new SimpleStringSchema, properties)
     val stream = env.addSource(kafkaSource).map(x => {
       val field = x.split(",")
-      Person(field(0).toInt, field(1), field(2).toInt)
+
     }).setParallelism(1)
     val table = StreamTableEnv.fromDataStream(stream)
     StreamTableEnv.createTemporaryView("person", table)
@@ -44,4 +44,7 @@ object DataStreamTableSql {
     StreamTableEnv.toAppendStream[Person](result).print()
     env.execute("stream_table_task")
   }
+
+  case class Person()
+
 }

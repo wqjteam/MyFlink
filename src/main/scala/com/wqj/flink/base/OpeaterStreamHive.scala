@@ -2,8 +2,8 @@ package com.wqj.flink.base
 
 import org.apache.flink.streaming.api.scala.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.{CheckpointingMode, TimeCharacteristic}
-import org.apache.flink.table.api.scala.StreamTableEnvironment
-import org.apache.flink.table.api.{EnvironmentSettings, TableEnvironment}
+import org.apache.flink.table.api.EnvironmentSettings
+import org.apache.flink.table.api.bridge.scala.StreamTableEnvironment
 import org.apache.flink.table.catalog.hive.HiveCatalog
 
 object OpeaterStreamHive {
@@ -19,7 +19,7 @@ object OpeaterStreamHive {
     tableEnv.registerCatalog("myhive", hive)
     tableEnv.useCatalog("myhive")
     val result = tableEnv.sqlQuery("select * from study.person")
-    tableEnv.toRetractStream[Person](result)
+    tableEnv.toRetractStream[String](result)
     tableEnv.execute("OpeaterHive")
   }
 }

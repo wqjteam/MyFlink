@@ -2,6 +2,7 @@ package com.wqj.flink.utils
 
 import java.sql.Timestamp
 
+import com.shtd.dw.utils.HbaseUtils
 import org.apache.hadoop.hbase.client._
 import org.apache.hadoop.hbase.filter._
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable
