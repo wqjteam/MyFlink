@@ -93,6 +93,7 @@ object ToAdsConsumptionAmountEveryhour {
     env.execute("Ads_Consumption_Amount_Everyhour")
   }
 
+
 }
 
 class MyRedisSinkMapperForHour extends RedisMapper[(String, String)] {
